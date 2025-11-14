@@ -1,8 +1,18 @@
+import { Routes, Route } from 'react-router-dom';
+import TableList from './components/pages/TableList';
+import TableDetails from './components/pages/TableDetails';
+import NotFound from './components/pages/NotFound';
+
+
+
 function App() {
   return (
-    <div className="App">
-      <h1>Hello world</h1>
-    </div>
+    
+    <Routes>
+      <Route path = "/" element={<TableList />} />
+      <Route path = "/" element={<TableDetails/>} />
+      <Route path = "/" element={<NotFound/>} />
+    </Routes>
   );
 }
 
