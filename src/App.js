@@ -24,7 +24,7 @@ dispatch(loadTablesRequest()))
      <main>
        <Routes>
          <Route path = "/" element={<TableList />} />
-         <Route path = "/table:id" element={<TableDetails/>} />
+         <Route path = "/table/:id" element={<TableDetails/>} />
          <Route path = "*" element={<NotFound/>} />
        </Routes>
      </main>
