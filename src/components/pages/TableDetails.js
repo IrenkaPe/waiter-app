@@ -1,8 +1,8 @@
 import { useParams, useNavigate } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import { useState, useEffect } from "react";
-import { Container, Form, Button } from "react-bootstrap";
-import { updateTable } from "../../store/tablesRedux"; 
+import { Container, Form, Button, Alert } from "react-bootstrap";
+import { updateTableRequest } from "../../store/tablesRedux"; 
 
 const TableDetails = () => {
   const { id } = useParams();
@@ -17,6 +17,9 @@ const TableDetails = () => {
     maxPeopleAmount: 0,
     bill: 0
   });
+
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     if (table) {
@@ -33,7 +36,6 @@ const TableDetails = () => {
   const handleChange = (e) => {
     const { name, value } = e.target;
 
-    
 
     setFormData(prev => {
         let updated = {...prev, [name]: value };
@@ -53,11 +55,20 @@ const TableDetails = () => {
     });
   };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    dispatch(updateTable(table.id, formData));
+  const handleSubmit = async (e) => {
+  e.preventDefault();
+  setLoading(true);
+  setError(null);
+
+  try {
+    await dispatch(updateTableRequest(table.id, formData));
     navigate('/');
-  };
+  } catch (err) {
+    setError(err.message);
+  } finally {
+    setLoading(false);
+  }
+};
 
   if (!table) {
     return (
@@ -72,6 +83,9 @@ const TableDetails = () => {
   return (
     <Container>
       <h2>Table {table.id}</h2>
+      {loading && <p>Loading...</p>}
+      {error && <Alert variant="danger">Błąd: {error}</Alert>}
+
       <Form onSubmit={handleSubmit}>
         <Form.Group className="mb-3">
           <Form.Label>Status</Form.Label>
@@ -82,6 +96,7 @@ const TableDetails = () => {
             <option value="Cleaning">Cleaning</option>
           </Form.Select>
         </Form.Group>
+
         <Form.Group className="mb-3">
           <Form.Label>People Amount</Form.Label>
           <Form.Control
@@ -116,7 +131,9 @@ const TableDetails = () => {
             />
           </Form.Group>
         )}
-        <Button variant="success" type="submit">Update</Button>
+        <Button variant="success" type="submit" disabled={loading}>
+          {loading ? 'Updating...' : 'Update'}
+        </Button>
       </Form>
     </Container>
   );

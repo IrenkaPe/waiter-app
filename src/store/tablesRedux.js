@@ -12,16 +12,39 @@ export const loadTable = (payload) => ({
 });
 
 
-export const updateTable = (id, formData) => {
+export const updateTable = (id, updatedTable) => {
+    return {
+        type: UPDATE_TABLE, 
+        payload: { id, ...updatedTable }
+    };
+};
+
+export const updateTableRequest = (id, formData) => {
+  return async (dispatch) => {
     const processedData = {
         ...formData,
         ...(formData.status === 'Free' || formData.status === 'Cleaning' ? { peopleAmount: 0, bill: 0 } : {})
     };
 
-    return {
-        type: UPDATE_TABLE, 
-        payload: { id, ...processedData }
-    };
+
+    try {
+      const response = await fetch(`http://localhost:3131/api/tables/${id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(processedData),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to update table on server');
+      }
+
+      const updatedTable = await response.json();
+
+      dispatch(updateTable(id, updatedTable));
+    } catch (error) {
+      console.error('Error updating table:', error.message);
+    }
+  };
 };
 
 export const loadTablesRequest = () => {
