@@ -4,11 +4,26 @@
 const createActionName = actionName => `app/tables/${actionName}`;
 
 const LOAD_TABLES = createActionName('LOAD_TABLES');
+const UPDATE_TABLE = createActionName('UPDATE_TABLE');
 
 export const loadTable = (payload) => ({
     type: LOAD_TABLES,
     payload,
-})
+});
+
+
+export const updateTable = (id, formData) => {
+    const processedData = {
+        ...formData,
+        ...(formData.status === 'Free' || formData.status === 'Cleaning' ? { peopleAmount: 0, bill: 0 } : {})
+    };
+
+    return {
+        type: UPDATE_TABLE, 
+        payload: { id, ...processedData }
+    };
+};
+
 export const loadTablesRequest = () => {
   return async (dispatch) => {
     try {
@@ -23,13 +38,17 @@ export const loadTablesRequest = () => {
     }
   };
 };
-// action creators
 
 // reducer
 const tablesReducer = (statePart = [], action) => {
   switch (action.type) {
     case LOAD_TABLES:
         return action.payload;
+    case UPDATE_TABLE:
+        const { id, ...updates } = action.payload;
+        return statePart.map(table =>
+            table.id === id ? { ...table, ...updates } : table
+        );
     default:
       return statePart;
   }

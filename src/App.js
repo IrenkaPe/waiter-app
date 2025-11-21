@@ -18,6 +18,8 @@ function App() {
  useEffect(() => 
 dispatch(loadTablesRequest()))
 
+ 
+
   return (
    <Container>
      <Header />
